@@ -1,10 +1,28 @@
 async function send() {
   const msg = document.getElementById("msg").value;
-  const res = await fetch("https://emotion-adaptive-backend.onrender.com/analyze", {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({message: msg})
-  });
-  const data = await res.json();
-  document.getElementById("out").innerText = JSON.stringify(data, null, 2);
+  const output = document.getElementById("out");
+
+  try {
+    const res = await fetch(
+      "https://emotion-adaptive-backend.onrender.com/analyze",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message: msg })
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error("Server error: " + res.status);
+    }
+
+    const data = await res.json();
+    output.innerText = JSON.stringify(data, null, 2);
+
+  } catch (err) {
+    output.innerText = "❌ Error: " + err.message;
+    console.error(err);
+  }
 }
