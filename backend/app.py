@@ -7,10 +7,10 @@ app = FastAPI()
 class ChatInput(BaseModel):
     message: str
 
-with open("models/emotion_model.pkl","rb") as f:
+with open("backend/models/emotion_model.pkl","rb") as f:
     emotion_model = pickle.load(f)
 
-with open("models/engagement_model.pkl","rb") as f:
+with open("backend/models/engagement_model.pkl","rb") as f:
     engagement_model = pickle.load(f)
 
 emotion_map = {"happy":0,"sad":1,"angry":2,"neutral":3}
@@ -37,3 +37,7 @@ def analyze(data: ChatInput):
         "engagement": engagement,
         "response": adaptive_reply(emotion, engagement)
     }
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
