@@ -44,14 +44,19 @@ def analyze(data: ChatInput):
 
     if any(greet in text_lower for greet in greetings):
         emotion = "neutral"
+        confidence = 1.0
     else:
-        emotion = emotion_model.predict([data.message])[0]
+        probs = emotion_model.predict_proba([data.message])[0]
+        emotion_index = probs.argmax()
+        emotion = emotion_model.classes_[emotion_index]
+        confidence = round(float(probs[emotion_index]), 2)
 
     features = [[emotion_map.get(emotion, 3), len(data.message), 2, 0]]
     engagement = engagement_model.predict(features)[0]
 
     return {
         "emotion": emotion,
+        "confidence": confidence,
         "engagement": engagement,
         "response": adaptive_reply(emotion, engagement)
     }
