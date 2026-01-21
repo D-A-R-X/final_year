@@ -46,10 +46,15 @@ def analyze(data: ChatInput):
         emotion = "neutral"
         confidence = 1.0
     else:
-        probs = emotion_model.predict_proba([data.message])[0]
-        emotion_index = probs.argmax()
-        emotion = emotion_model.classes_[emotion_index]
-        confidence = round(float(probs[emotion_index]), 2)
+        # Emotion prediction with safety
+        try:
+            probs = emotion_model.predict_proba([data.message])[0]
+            emotion_index = probs.argmax()
+            emotion = emotion_model.classes_[emotion_index]
+            confidence = round(float(probs[emotion_index]), 2)
+        except:
+            emotion = emotion_model.predict([data.message])[0]
+            confidence = None
 
     features = [[emotion_map.get(emotion, 3), len(data.message), 2, 0]]
     engagement = engagement_model.predict(features)[0]
