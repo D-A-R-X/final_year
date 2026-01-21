@@ -38,7 +38,15 @@ def root():
 
 @app.post("/analyze")
 def analyze(data: ChatInput):
-    emotion = emotion_model.predict([data.message])[0]
+    greetings = ["hi", "hello", "hey", "hii", "hiii"]
+
+    text_lower = data.message.lower()
+
+    if any(greet in text_lower for greet in greetings):
+        emotion = "neutral"
+    else:
+        emotion = emotion_model.predict([data.message])[0]
+
     features = [[emotion_map.get(emotion, 3), len(data.message), 2, 0]]
     engagement = engagement_model.predict(features)[0]
 
