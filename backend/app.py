@@ -1,8 +1,20 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import pickle
 
-app = FastAPI()
+app = FastAPI(
+    title="Emotion-Aware Adaptive Conversational AI"
+)
+
+# ✅ ADD THIS BLOCK
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # allow all origins (safe for academic project)
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class ChatInput(BaseModel):
     message: str
