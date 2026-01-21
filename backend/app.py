@@ -3,15 +3,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import pickle
 
-app = FastAPI(
-    title="Emotion-Aware Adaptive Conversational AI"
-)
+app = FastAPI(title="Emotion-Aware Adaptive Conversational AI")
 
-# ✅ ADD THIS BLOCK
+# ✅ CORS — THIS IS MANDATORY
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # allow all origins (safe for academic project)
-    allow_credentials=True,
+    allow_origins=["*"],   # allow all (OK for academic project)
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -19,29 +16,30 @@ app.add_middleware(
 class ChatInput(BaseModel):
     message: str
 
-with open("backend/models/emotion_model.pkl","rb") as f:
+# Load models
+with open("models/emotion_model.pkl", "rb") as f:
     emotion_model = pickle.load(f)
 
-with open("backend/models/engagement_model.pkl","rb") as f:
+with open("models/engagement_model.pkl", "rb") as f:
     engagement_model = pickle.load(f)
 
-emotion_map = {"happy":0,"sad":1,"angry":2,"neutral":3}
+emotion_map = {"happy": 0, "sad": 1, "angry": 2, "neutral": 3}
 
 def adaptive_reply(emotion, engagement):
     if engagement == "Low":
         return "I sense frustration. Want help?"
-    if engagement == "Medium":
+    elif engagement == "Medium":
         return "You're doing okay. Need guidance?"
     return "Great! Let's continue."
 
 @app.get("/")
 def root():
-    return {"status":"Backend running"}
+    return {"status": "Backend running with CORS enabled"}
 
 @app.post("/analyze")
 def analyze(data: ChatInput):
     emotion = emotion_model.predict([data.message])[0]
-    features = [[emotion_map.get(emotion,3), len(data.message), 2, 0]]
+    features = [[emotion_map.get(emotion, 3), len(data.message), 2, 0]]
     engagement = engagement_model.predict(features)[0]
 
     return {
@@ -49,7 +47,3 @@ def analyze(data: ChatInput):
         "engagement": engagement,
         "response": adaptive_reply(emotion, engagement)
     }
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
