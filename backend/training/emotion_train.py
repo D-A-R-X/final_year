@@ -1,44 +1,36 @@
 import pandas as pd
 import pickle
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.svm import LinearSVC
 
-# -----------------------------
-# SAMPLE EMOTION DATASET
-# -----------------------------
 data = {
-    "message": [
-        "I am so happy today!",
-        "This makes me sad",
-        "I am angry about this",
-        "Feeling neutral",
-        "Great day ahead",
-        "Feeling down",
-        "This is frustrating",
-        "Nothing special",
-        "Excited for the weekend",
-        "Disappointed with results"
+    "text": [
+        "I am happy",
+        "This is great",
+        "I feel sad",
+        "This is annoying",
+        "I am angry",
+        "Feeling tired",
+        "Awesome work",
+        "This is bad"
     ],
-    "emotion": ["happy", "sad", "angry", "neutral", "happy", "sad", "angry", "neutral", "happy", "sad"]
+    "emotion": [
+        "happy", "happy", "sad", "angry",
+        "angry", "sad", "happy", "sad"
+    ]
 }
 
 df = pd.DataFrame(data)
 
-X = df["message"]
-y = df["emotion"]
-
-# Create pipeline
-pipeline = Pipeline([
-    ('vectorizer', CountVectorizer()),
-    ('classifier', MultinomialNB())
+model = Pipeline([
+    ("tfidf", TfidfVectorizer()),
+    ("clf", LinearSVC())
 ])
 
-# Train model
-pipeline.fit(X, y)
+model.fit(df["text"], df["emotion"])
 
-# Save model
 with open("models/emotion_model.pkl", "wb") as f:
-    pickle.dump(pipeline, f)
+    pickle.dump(model, f)
 
-print("✅ Emotion model trained and saved successfully.")
+print("Emotion model saved")
