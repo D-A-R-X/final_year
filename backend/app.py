@@ -5,11 +5,11 @@ import pickle
 
 app = FastAPI(title="Emotion-Aware Adaptive Conversational AI")
 
-# ✅ CORS — THIS IS MANDATORY
+# ✅ CORS — browser + preflight safe
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],   # allow all (OK for academic project)
-    allow_methods=["*"],
+    allow_origins=["*"],          # OK for academic project
+    allow_methods=["*"],          # allows OPTIONS, POST, GET
     allow_headers=["*"],
 )
 
@@ -34,7 +34,7 @@ def adaptive_reply(emotion, engagement):
 
 @app.get("/")
 def root():
-    return {"status": "Backend running with CORS enabled"}
+    return {"status": "Backend running (app.py, CORS enabled)"}
 
 @app.post("/analyze")
 def analyze(data: ChatInput):
